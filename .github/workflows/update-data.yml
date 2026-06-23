@@ -1,0 +1,41 @@
+name: Auto Update Data
+on:
+  schedule:
+    # 每周一凌晨2点 UTC（国内上午10点）
+    - cron: "0 2 * * 1"
+  workflow_dispatch: # 支持手动触发
+
+permissions:
+  contents: write # Actions写入仓库权限
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      # 这里写你的脚本，生成上面这份json文件
+      - name: Generate json file
+        run: |
+          cat > data.json << EOF
+          {
+            "sites": [],
+            "lives": [],
+            "parses": [],
+            "update_time": "GitHub Actions 每周一自动更新"
+          }
+          EOF
+
+      # 提交推送更新文件
+      - name: Commit & Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update data file" && git push)
