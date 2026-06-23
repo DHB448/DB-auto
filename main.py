@@ -2,40 +2,54 @@ import json
 import requests
 from datetime import datetime
 
-# ====================== 爬虫逻辑区 ======================
 sites = []
 lives = []
 parses = []
+url_set = set()  # 去重专用
 
-# 示例：抓取公开测试接口数据，你可以替换成自己目标网址
+# 超宽松关键词，不漏任何直播/解析接口
+keywords = ["live", "player", "api", "m3u8", "hls", "vod", "点播", "直播", "解析"]
+
 try:
-    resp = requests.get("https://jsonplaceholder.typicode.com/posts", timeout=10)
+    resp = requests.get("https://jsonplaceholder.typicode.com/posts", timeout=15)
     if resp.status_code == 200:
-        raw_data = resp.json()
-        # 截取部分数据填入 sites
-        for item in raw_data[:3]:
-            sites.append({
-                "id": item["id"],
-                "title": item["title"]
-            })
+        raw = resp.json()
+        for item in raw:
+            url = str(item.get("url", ""))
+            title = str(item.get("title", ""))
+
+            # 宽松模糊匹配
+            if any(k in url.lower() or k in title for k in keywords):
+                # 链接不重复才加入
+                if url not in url_set:
+                    url_set.add(url)
+                    sites.append({"name": title, "url": url})
+
+    # 通用直播线路
+    lives = [
+        {"name": "高清直播线路", "url": ""},
+        {"name": "备用直播线路", "url": ""}
+    ]
+
+    # 全网通用宽松解析规则（不限域名）
+    parses = [
+        {"domain": "*", "rule": "m3u8通用解析"},
+        {"domain": "*.cn", "rule": "国内线路解析"},
+        {"domain": "*.com", "rule": "海外接口解析"}
+    ]
+
 except Exception as e:
-    print(f"抓取失败：{e}")
+    print("抓取出错：", e)
 
-# 模拟 lives、parses 数据，可自行替换爬虫逻辑
-lives = [{"name": "测试直播1", "url": "https://xxx.com/live1"}]
-parses = [{"domain": "demo.com", "rule": "regex_parse"}]
-# ======================================================
-
-# 组装最终JSON结构
-output_data = {
+# 自动更新当天日期
+data = {
     "sites": sites,
     "lives": lives,
     "parses": parses,
-    "update_time": "GitHub Actions 每周一自动更新"
+    "update_time": f"GitHub Actions 每周自动更新 {datetime.now().strftime('%Y-%m-%d %H:%M')}"
 }
 
-# 写入 data.json，格式化、中文不乱码
 with open("data.json", "w", encoding="utf-8") as f:
-    json.dump(output_data, f, ensure_ascii=False, indent=2)
+    json.dump(data, f, ensure_ascii=False, indent=2)
 
-print("data.json 生成完成")
+print("✅ 宽松抓取+去重完成，无重复接口")
