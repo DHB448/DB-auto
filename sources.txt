@@ -1,3 +1,8 @@
 https://cdn.qiaoji8.com/tvbox.json
+http://home.jundie.top:81/top98.json
+https://www.饭太硬.com/tv
+https://raw.githubusercontent.com/liu673cn/box/main/m.json
+https://raw.githubusercontent.com/yoursmile66/TVBox/main/XC.json
+https://cdn.qiaoji8.com/tvbox.json
 https://tvbox.cainisi.cf
 https://ghproxy.com/https://raw.githubusercontent.com/liu673cn/box/main/m.json
