@@ -1,41 +1,41 @@
 name: Auto Update Data
 on:
   schedule:
-    # 每周一凌晨2点 UTC（国内上午10点）
+    # UTC时间每周一凌晨2点，对应国内10点
     - cron: "0 2 * * 1"
-  workflow_dispatch: # 支持手动触发
+  workflow_dispatch: # 支持网页手动运行
 
+# Actions写入仓库权限
 permissions:
-  contents: write # Actions写入仓库权限
+  contents: write
 
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
+      # 拉取仓库代码
       - name: Checkout code
         uses: actions/checkout@v5
 
+      # 配置Python
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
-      # 这里写你的脚本，生成上面这份json文件
-      - name: Generate json file
-        run: |
-          cat > data.json << EOF
-          {
-            "sites": [],
-            "lives": [],
-            "parses": [],
-            "update_time": "GitHub Actions 每周一自动更新"
-          }
-          EOF
+      # 安装爬虫依赖 requests
+      - name: Install crawl dependencies
+        run: pip install requests
 
-      # 提交推送更新文件
-      - name: Commit & Push changes
+      # 运行爬虫脚本生成 data.json
+      - name: Run crawl script
+        run: python3 main.py
+
+      # 自动提交并推送更新后的json文件
+      - name: Commit & Push new data
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add data.json
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto update data file" && git push)
+          # 无变更则跳过提交，有变更才推送
+          git diff --quiet && git diff --staged --quiet || (git commit -m "🤖 自动化更新数据文件" && git push)
