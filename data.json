@@ -1,0 +1,33 @@
+{
+  "sites": [
+    {
+      "name": "voluptas blanditiis repellendus animi ducimus error sapiente et suscipit",
+      "url": ""
+    }
+  ],
+  "lives": [
+    {
+      "name": "高清直播线路",
+      "url": ""
+    },
+    {
+      "name": "备用直播线路",
+      "url": ""
+    }
+  ],
+  "parses": [
+    {
+      "domain": "*",
+      "rule": "m3u8通用解析"
+    },
+    {
+      "domain": "*.cn",
+      "rule": "国内线路解析"
+    },
+    {
+      "domain": "*.com",
+      "rule": "海外接口解析"
+    }
+  ],
+  "update_time": "GitHub Actions 每周自动更新 2026-06-23 08:26"
+}
