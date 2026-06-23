@@ -9,7 +9,7 @@ parses = []
 
 # 示例：抓取公开测试接口数据，你可以替换成自己目标网址
 try:
-    resp = requests.get("https://jsonplaceholder.typicode.com/posts", timeout=10)
+    resp = requests.get("https://raw.githubusercontent.com/liu673cn/box/main/m.json", timeout=10)
     if resp.status_code == 200:
         raw_data = resp.json()
         # 截取部分数据填入 sites
