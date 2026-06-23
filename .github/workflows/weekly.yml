@@ -1,0 +1,35 @@
+name: 每周一自动更新TVBox源
+on:
+  schedule:
+    # UTC时间 0点=北京时间早上8点 每周一执行
+    - cron: "0 0 * * 1"
+  # 支持手动一键运行测试
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: 拉取仓库代码
+        uses: actions/checkout@v4
+
+      - name: 安装Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 执行抓取校验脚本
+        run: python check_merge.py
+
+      - name: 提交更新后的配置文件
+        run: |
+          git config --global user.name "SourceBot"
+          git config --global user.email "bot@github.com"
+          git add tvbox.json
+          git diff --quiet && git diff --staged --quiet || git commit -m "自动更新可用影视仓"
+          git push
